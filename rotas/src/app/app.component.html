@@ -1,0 +1,100 @@
+<div class="titulo">{{ title }}</div>
+
+<div id="sides">
+    <div id="left">
+        <form class="form-horizontal" [formGroup]="searchForm"
+            (ngSubmit)="onSubmit(originPlacesRef.place, destinationPlacesRef.place)">
+            <div class="row">
+                <div class="col-6 form-group" [ngClass]="displayFieldCss('originLocation')">
+                    <label for="originLocation" class="control-label required">Origem:</label>
+                    <input type="text" ngx-google-places-autocomplete required maxlength="500" id="originLocation"
+                        class="form-control" [options]='googlePlacesOptions' formControlName="originLocation"
+                        #originPlacesRef="ngx-places"
+                        (onAddressChange)="onSubmit(originPlacesRef.place, destinationPlacesRef.place)" />
+                    <app-field-error-display [displayError]="isFieldValid('originLocation')"
+                        errorMsg="Por favor, informe o local de origem">
+                    </app-field-error-display>
+                </div>
+                <div class="col-3 form-group" [ngClass]="displayFieldCss('originDate')">
+                    <label for="originDate" class="control-label required">Data de origem:</label>
+                    <input type="date" [min]="todayDate" id="originDate" class="form-control" required
+                        formControlName="originDate" />
+                    <app-field-error-display [displayError]="isFieldValid('originDate')"
+                        errorMsg="Por favor, informe a data de origem">
+                    </app-field-error-display>
+                    <app-field-error-display *ngIf="formSubmitAttempt" [displayError]="!validOriginDate('originDate')"
+                        errorMsg="A data de origem deve ser menor ou igual às demais datas">
+                    </app-field-error-display>
+                </div>
+            </div>
+
+            <div formArrayName="way_points">
+                <div *ngFor="let item of wayPoints.controls; let pointIndex=index" [formGroupName]="pointIndex">
+                    <div class="row">
+                        <div class="col-6 form-group">
+                            <label for="point" class="control-label">Parada:</label>
+                            <input type="text" ngx-google-places-autocomplete maxlength="500" id="point"
+                                class="form-control" [options]='googlePlacesOptions' formControlName="point"
+                                #pointPlacesRef="ngx-places"
+                                (onAddressChange)="handleAddressChangePoint(pointIndex, pointPlacesRef.place, originPlacesRef.place, destinationPlacesRef.place)" />
+                        </div>
+                        <div class="col-3 form-group">
+                            <label for="pointDate" class="control-label">Data de parada:</label>
+                            <input type="date" [min]="todayDate" id="pointDate" class="form-control"
+                                formControlName="pointDate" />
+                            <app-field-error-display *ngIf="formSubmitAttempt"
+                                [displayError]="wayPoints.value[pointIndex].pointDateValid == false"
+                                errorMsg="Não pode ser menor que a origem, nem maior que a próxima parada e nem maior que o destino">
+                            </app-field-error-display>
+                        </div>
+                        <div class="col-3 form-group">
+                            <input type="button" id="btnDelete" class="btn btn-danger" value="Excluir parada"
+                                (click)="deleteWayPoint(pointIndex)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" [disabled]="this.searchForm.get('way_points').value.length > 7"
+                (click)="addWayPoint()">Adicionar parada</button>
+
+            <div class="row">
+                <div class="col-6 form-group" [ngClass]="displayFieldCss('destinationLocation')">
+                    <label for="destinationLocation" class="control-label required">Destino:</label>
+                    <input type="text" ngx-google-places-autocomplete required maxlength="500" id="destinationLocation"
+                        class="form-control" [options]='googlePlacesOptions' formControlName="destinationLocation"
+                        #destinationPlacesRef="ngx-places"
+                        (onAddressChange)="onSubmit(originPlacesRef.place, destinationPlacesRef.place)" />
+                    <app-field-error-display [displayError]="isFieldValid('destinationLocation')"
+                        errorMsg="Por favor, informe o local de destino">
+                    </app-field-error-display>
+                </div>
+                <div class="col-3 form-group" [ngClass]="displayFieldCss('destinationDate')">
+                    <label for="destinationDate" class="control-label required">Data de destino:</label>
+                    <input type="date" [min]="todayDate" id="destinationDate" class="form-control" required
+                        formControlName="destinationDate" />
+                    <app-field-error-display [displayError]="isFieldValid('destinationDate')"
+                        errorMsg="Por favor, informe a data de destino">
+                    </app-field-error-display>
+                    <app-field-error-display *ngIf="formSubmitAttempt"
+                        [displayError]="!validDestinationDate('destinationDate')"
+                        errorMsg="A data de destino deve ser maior ou igual às demais datas">
+                    </app-field-error-display>
+                </div>
+            </div>
+
+            <button id="btnCancel" class="btn btn-warning" (click)="cleanForm()">Cancelar</button>
+            <button type="submit" class="btn btn-success">
+                Enviar
+            </button>
+        </form>
+    </div>
+    <div id="right">
+        <agm-map [latitude]="latitude" [longitude]="longitude">
+            <agm-direction [origin]="origin" [destination]="destination" [(waypoints)]="waypoints">
+            </agm-direction>
+        </agm-map>
+        <h4><b>Tempo estimado:</b> {{ getDuration(time) }}</h4>
+        <h4><b>Distância estimada:</b> {{ distance / 1000 | number: '1.1-1' }} quilômetros</h4>
+    </div>
+</div>

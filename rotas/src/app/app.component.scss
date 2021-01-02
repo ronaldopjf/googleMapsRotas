@@ -1,0 +1,44 @@
+agm-map {
+    height: 300px;
+}
+
+#btnDelete {
+    margin-top: 27.5px;
+}
+
+#btnCancel {
+    margin-right: 15px;
+}
+
+.control-label.required:after {
+    color: #d00;
+    content: "*";
+    position: absolute;
+    margin-left: 5px;
+    top: 7px;
+}
+
+div.titulo {
+    font-size: 5vw;
+    background-color: darkcyan;
+    color: white;
+    text-align: center;
+    padding: 3vw;
+    position: relative;
+}
+
+#sides {
+    margin-top: 10px;
+}
+
+#left {
+    float: left;
+    width: 50%;
+    overflow: hidden;
+}
+
+#right {
+    float: left;
+    width: 50%;
+    overflow: hidden;
+}
